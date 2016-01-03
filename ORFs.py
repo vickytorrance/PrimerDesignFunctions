@@ -8,7 +8,7 @@
 import re
 
 def find_ATG(sequence):
-    ATG = [ATG.append(m.start()) for m in re.finditer('ATG', sequence)]
+    ATG = [(m.start()) for m in re.finditer('ATG', sequence)]
     return ATG
     
 def find_STOP(sequence):

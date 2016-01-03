@@ -61,8 +61,15 @@ def designPrimerpair(seq, TM, nmin=15, nmax=30):
 
     return Fprimer, Rprimer
 
+def designHomologyPair(seq, dist=40):
 
-def designPrimerR(seq, TM, dist, nmin=15, nmax=30):
+    seqRC= reverseComp(seq)
+    forHomology = seq[:dist]
+    revHomology = seqRC[:dist]
+
+    return forHomology, revHomology
+
+def designPrimerR(seq, TM, dist, nmin=15, nmax=35):
     ''' Returns a reverse primer exactly dist nucleotides away from start'''
     new = seq[:dist]
     xf = [new[-a:] for a in xrange(nmin, nmax)]
