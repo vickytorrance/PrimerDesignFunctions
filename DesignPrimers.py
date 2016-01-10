@@ -6,7 +6,9 @@ import pickle
 from intermine.webservice import Service
 import readingAPEfunctions as AP
 
-pDL1728 = open(r"plasmid.ape").read()
+
+#If constructing a new plasmid and inserting a sequence into a vector by homologous recombination read in the plasmid here
+#pDL1728 = open(r"plasmid.ape").read()
 
 # IF the PCR product will contain 'homology tails' insert them here
 homology_F = ''
