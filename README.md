@@ -8,3 +8,6 @@ DesignPrimers.py uses yeastmine to obtain genomic DNA sequences used in primer d
 •	Gene deletion
 
 •	Incorporation of a protein TAG
+
+
+Primers will be generated for those genes listed in input.txt
