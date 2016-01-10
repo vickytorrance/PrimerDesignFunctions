@@ -31,6 +31,7 @@ def reverseComp(seq):
     '''Function to calculate reverse complement.'''
 
     seq2 = seq[::-1]
+    seq2 = seq2.upper()
     seq3 = seq2.replace('A','t')
     seq4 = seq3.replace('T', 'A')
     seq5 = seq4.replace('G', 'c')
