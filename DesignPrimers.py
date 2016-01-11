@@ -7,8 +7,13 @@ from intermine.webservice import Service
 import readingAPEfunctions as AP
 
 
+################ USER INPUT REQUIRED HERE################
+
 #If constructing a new plasmid and inserting a sequence into a vector by homologous recombination read in the plasmid here
-#pDL1728 = open(r"plasmid.ape").read()
+#MyPlasmid = open(r"pDL1728.ape").read()
+
+# The tm of the primers can be changed here.
+PrimerTM = 55
 
 # IF the PCR product will contain 'homology tails' insert them here
 homology_F = ''
@@ -20,6 +25,7 @@ homology_R = ''
 amplify_F = ''
 amplify_R = ''
 
+#########################################################
 
 PrimerTypeAns = raw_input('Would you like to... \n a: design primers to be used to delete a region of DNA (homology tails) \n b: just amplify the DNA\n c: incorporate a TAG\n').lower()
 
@@ -47,9 +53,9 @@ if PrimerTypeAns == 'a' or PrimerTypeAns == 'b' :
 
 if PrimerTypeAns == 'b':
     writeAPE = raw_input('Create an APE file of the PCR product? y/n\n').lower()
-
-if PrimerTypeAns == 'b':
     plas = raw_input('If cloning the product into a vector would you like an APE file of the PCR product in your plasmid? y/n\n').lower()
+
+direction = raw_input('Do you want the insert in the opposite direction? y/n\n').lower()
 
 genes = open(r'input')
 promoters = open(r"yeast promoter sizes from YPA.txt")
@@ -113,22 +119,24 @@ if PrimerPosition =='Promoter':
         try:
             promoter_len =  int(promoterdict[gene])
             promoter_seq = upstreamseq [-promoter_len:]
-        #    Remember to include for my sequences
-        #    promoter_seq = Primers.reverseComp(promoter_seq)
+            if direction == 'y':
+                promoter_seq = Primers.reverseComp(promoter_seq)
+        #    Remember to include if sequence is to be reverse orientation 
+        #  promoter_seq = Primers.reverseComp(promoter_seq)
             if PrimerType == 'amplification':
-                primers = Primers.designPrimerpair(promoter_seq, 55)
+                primers = Primers.designPrimerpair(promoter_seq, PrimerTM)
                 primers =  homology_F + primers[0], homology_R + primers[1]
                 if writeAPE == 'y':
                     AP.SaveToApe(promoter_seq, str(mydict[gene][0])+'   '+gene)
-                    if plas == 'y':
-                        newPlasmid = AP.replaceAPEseq(pDL1728, promoter_seq, homology_F , homology_R ,str(mydict[gene][0]) )
-                        newPlasmid = AP.insertFeature(newPlasmid, promoter_seq, label = str(mydict[gene][0]), colour = 'cyan')
-                        AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
+                if plas == 'y':
+                    newPlasmid = AP.replaceAPEseq(MyPlasmid, promoter_seq, homology_F , homology_R ,str(mydict[gene][0]) )
+                    newPlasmid = AP.insertFeature(newPlasmid, promoter_seq, label = str(mydict[gene][0]), colour = 'cyan')
+                    AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
             elif PrimerType =='homology':
                 primers = Primers.designHomologyPair(promoter_seq)
                 primers =  primers[0] + amplify_F, primers[1] + amplify_R
 
-            print homology_F + primers[0], homology_R + primers[1]
+            print primers[0], primers[1]
             g.write(str(mydict[gene][0])+'\t'+ gene +'\t'+ str(primers) + '\n')
         except KeyError:
             print "we don't know the promoter length of %s"%gene
@@ -143,15 +151,17 @@ elif PrimerPosition =='Flanking':
             down1000_seq =  str(mydict[gene][2])
             down1000_seq = down1000_seq[:downstream]
             mySeq = up1000_seq +str(mydict[gene][3])+  down1000_seq
+            if direction == 'y':
+                mySeq = Primers.reverseComp(mySeq)
             if PrimerType == 'amplification':
-                primers = Primers.designPrimerpair(mySeq, 55)
+                primers = Primers.designPrimerpair(mySeq, PrimerTM)
                 primers = homology_F + primers[0], homology_R + primers[1]
                 if writeAPE == 'y':
                     AP.SaveToApe(mySeq, str(mydict[gene][0])+'   '+gene)
-                    if plas == 'y':
-                        newPlasmid = AP.replaceAPEseq(pDL1728, mySeq, homology_F , homology_R, str(mydict[gene][0]) )
-                        newPlasmid = AP.insertFeature(newPlasmid, mySeq, label = str(mydict[gene][0]), colour = 'cyan')
-                        AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
+                if plas == 'y':
+                    newPlasmid = AP.replaceAPEseq(MyPlasmid, mySeq, homology_F , homology_R, str(mydict[gene][0]) )
+                    newPlasmid = AP.insertFeature(newPlasmid, mySeq, label = str(mydict[gene][0]), colour = 'cyan')
+                    AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
             elif PrimerType =='homology':
                 primers = Primers.designHomologyPair(mySeq)
                 primers =  primers[0] + amplify_F, primers[1] + amplify_R
@@ -164,15 +174,17 @@ elif PrimerPosition =='ORF':
             gene = gene1.rstrip('\n')
             gene = gene.rstrip('\r')
             SEQorf = str(mydict[gene][3])
+            if direction == 'y':
+                SEQorf = Primers.reverseComp(SEQorf)
             if PrimerType == 'amplification':
-                primers = Primers.designPrimerpair(SEQorf, 55)
+                primers = Primers.designPrimerpair(SEQorf, PrimerTM)
                 primers = homology_F + primers[0], homology_R + primers[1]
                 if writeAPE == 'y':
                     AP.SaveToApe(SEQorf, str(mydict[gene][0])+'   '+gene)
-                    if plas == 'y':
-                        newPlasmid = AP.replaceAPEseq(pDL1728, SEQorf, homology_F , homology_R ,str(mydict[gene][0]) )
-                        newPlasmid = AP.insertFeature(newPlasmid, SEQorf, label = str(mydict[gene][0]), colour = 'cyan')
-                        AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
+                if plas == 'y':
+                    newPlasmid = AP.replaceAPEseq(MyPlasmid, SEQorf, homology_F , homology_R ,str(mydict[gene][0]) )
+                    newPlasmid = AP.insertFeature(newPlasmid, SEQorf, label = str(mydict[gene][0]), colour = 'cyan')
+                    AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
             elif PrimerType =='homology':
                 primers = Primers.designHomologyPair(SEQorf)
                 primers =   primers[0] + amplify_F, primers[1] + amplify_R

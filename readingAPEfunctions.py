@@ -147,6 +147,6 @@ def updateMiscFeatureLocs(file_contents, lenDNA, startPos):
     return file_contents
 
 def SaveToApe(newFile, fileName):
-    with open(r"%s.ape"%(fileName), "w") as fp:
+    with open(r"Ape_files\%s.ape"%(fileName), "w") as fp:
         fp.write(newFile)
 
