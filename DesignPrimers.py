@@ -55,7 +55,8 @@ if PrimerTypeAns == 'b':
     writeAPE = raw_input('Create an APE file of the PCR product? y/n\n').lower()
     plas = raw_input('If cloning the product into a vector would you like an APE file of the PCR product in your plasmid? y/n\n').lower()
 
-direction = raw_input('Do you want the insert in the opposite direction? y/n\n').lower()
+if PrimerPosition == 'Promoter' or PrimerPosition == 'Flanking' or PrimerPosition == 'ORF':
+    direction = raw_input('Do you want the insert in the opposite direction? y/n\n').lower()
 
 genes = open(r'input')
 promoters = open(r"yeast promoter sizes from YPA.txt")
@@ -78,7 +79,7 @@ query.add_constraint("Gene", "IN", "Verified_ORFs", code = "B")
 query.add_constraint("flankingRegions.direction", "=", "both", code = "C")
 query.add_constraint("flankingRegions.distance", "=", "1.0kb", code = "A")
 query.add_constraint("flankingRegions.includeGene", "=", "true", code = "D")
-
+'''
 
 mydict2 = {}
 # created a dict which contains the systematic gene name as the key and then
@@ -94,7 +95,7 @@ for row in query.rows():
 
 with open('tempthings.pickle', 'wb') as handle:
   pickle.dump(mydict2, handle)
-
+'''
 promoterdict = {}
 
 with open('tempthings.pickle', 'rb') as handle:
@@ -200,9 +201,11 @@ elif PrimerPosition == 'TAG':
             down1000_seq =  down1000_seq[:40]
             up1000_seq =  str(mydict[gene][1])
             up1000_seq = up1000_seq[-40:]
+            up1000_seq = up1000_seq + 'ATG'
             if TAG == 'b' or TAG == 'c':
                 SEQorf = str(mydict[gene][3])
                 SEQorf = SEQorf[-43:]
+                print SEQorf
                 mySeq = SEQorf + down1000_seq
             elif TAG == 'a' or TAG == 'n':
                 SEQorf = str(mydict[gene][3])
