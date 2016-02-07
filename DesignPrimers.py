@@ -10,14 +10,14 @@ import readingAPEfunctions as AP
 ################ USER INPUT REQUIRED HERE################
 
 #If constructing a new plasmid and inserting a sequence into a vector by homologous recombination read in the plasmid here
-#MyPlasmid = open(r"pDL1728.ape").read()
+MyPlasmid = open(r"pDL1728.ape").read()
 
 # The tm of the primers can be changed here.
 PrimerTM = 55
 
 # IF the PCR product will contain 'homology tails' insert them here
-homology_F = ''
-homology_R = ''
+homology_F = 'tccgtttcctttgttCTGGATCATAAACTTTCGAAGTCAT'
+homology_R = 'ccctcactaaagggaacaaaagctggagCTCCACCGCGG'
 
 
 # If homology regions for deletion or tagging a DNA seq are being designed
@@ -27,7 +27,7 @@ amplify_R = ''
 
 #########################################################
 
-PrimerTypeAns = raw_input('Would you like to... \n a: design primers to be used to delete a region of DNA (homology tails) \n b: just amplify the DNA\n c: incorporate a TAG\n').lower()
+PrimerTypeAns = raw_input('Would you like to... \n a: design primers to be used to delete a region of DNA (homology tails) \n b: design primers to amplify a region of DNA\n c: incorporate a TAG\n').lower()
 
 if PrimerTypeAns == 'a':
     PrimerType = 'homology'
@@ -126,7 +126,7 @@ if PrimerPosition =='Promoter':
         #  promoter_seq = Primers.reverseComp(promoter_seq)
             if PrimerType == 'amplification':
                 primers = Primers.designPrimerpair(promoter_seq, PrimerTM)
-                primers =  homology_F + primers[0], homology_R + primers[1]
+                primers =  homology_F.upper() + primers[0].lower(), homology_R.upper() + primers[1].lower()
                 if writeAPE == 'y':
                     AP.SaveToApe(promoter_seq, str(mydict[gene][0])+'   '+gene)
                 if plas == 'y':
@@ -135,7 +135,7 @@ if PrimerPosition =='Promoter':
                     AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
             elif PrimerType =='homology':
                 primers = Primers.designHomologyPair(promoter_seq)
-                primers =  primers[0] + amplify_F, primers[1] + amplify_R
+                primers =  primers[0].upper() + amplify_F.lower(), primers[1].upper() + amplify_R.lower()
 
             print primers[0], primers[1]
             g.write(str(mydict[gene][0])+'\t'+ gene +'\t'+ str(primers) + '\n')
@@ -148,15 +148,24 @@ elif PrimerPosition =='Flanking':
             gene = gene1.rstrip('\n')
             gene = gene.rstrip('\r')
             up1000_seq =  str(mydict[gene][1])
-            up1000_seq = up1000_seq[-upstream:]
             down1000_seq =  str(mydict[gene][2])
-            down1000_seq = down1000_seq[:downstream]
-            mySeq = up1000_seq +str(mydict[gene][3])+  down1000_seq
+            ORF = str(mydict[gene][3])
+            if downstream == 0: # if 0 is specified then only the upstream flanking DNA will be amplified               
+                down1000_seq = ''
+                ORF = ''
+            else :
+                down1000_seq = down1000_seq[:downstream]
+            if upstream == 0:
+                up1000_seq = ''
+                ORF = ''
+            else:    
+                up1000_seq = up1000_seq[-upstream:]
+            mySeq = up1000_seq + ORF +  down1000_seq
             if direction == 'y':
                 mySeq = Primers.reverseComp(mySeq)
             if PrimerType == 'amplification':
                 primers = Primers.designPrimerpair(mySeq, PrimerTM)
-                primers = homology_F + primers[0], homology_R + primers[1]
+                primers = homology_F.upper() + primers[0].lower(), homology_R.upper() + primers[1].lower()
                 if writeAPE == 'y':
                     AP.SaveToApe(mySeq, str(mydict[gene][0])+'   '+gene)
                 if plas == 'y':
@@ -165,7 +174,7 @@ elif PrimerPosition =='Flanking':
                     AP.SaveToApe(newPlasmid, str(mydict[gene][0]))
             elif PrimerType =='homology':
                 primers = Primers.designHomologyPair(mySeq)
-                primers =  primers[0] + amplify_F, primers[1] + amplify_R
+                primers =  primers[0].upper() + amplify_F.lower(), primers[1].upper() + amplify_R.lower()
             print str(mydict[gene][0]), gene, primers
             g.write(str(mydict[gene][0])+'\t'+ gene +'\t'+ str(primers) + '\n')
 
